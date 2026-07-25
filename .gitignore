@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+app/api/node_modules/
+
+# Environment & Logs
+.env
+*.log
+user-data.log
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Terraform Local State
+*.tfstate
+*.tfstate.backup
+.terraform/
