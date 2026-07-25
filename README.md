@@ -650,7 +650,63 @@ AWS_CLOUD/
 
 ## 🧠 Skills Demonstrated
 
-`AWS Cloud Engineering` • `DevOps Practice` • `Linux Systems Administration` • `VPC Networking` • `Cloud Security & Compliance` • `Layer-7 Load Balancing` • `Auto Scaling & Elasticity` • `DNS Management (Route53)` • `SSL/TLS Encryption` • `Monitoring & Observability` • `Troubleshooting & Forensics` • `Infrastructure Automation` • `Cloud Operations`
+The following enterprise skills, AWS Console management workflows, and Linux administration capabilities are fully implemented and demonstrated in this repository:
+
+<details open>
+<summary><b>1. ☁️ AWS Networking & Core Infrastructure Skills</b></summary>
+
+- 📐 **AWS Architecture Diagram**: End-to-end design of 3-tier, multi-AZ enterprise cloud architecture following AWS Well-Architected Framework.
+- 🏢 **VPC Dashboard**: Provisioning virtual private cloud topologies, IPv4 CIDR allocation (`10.0.0.0/16`), and DNS hostnames.
+- 🔀 **Public & Private Subnets**: Micro-segmenting public web subnets (`10.0.1.0/24`, `10.0.2.0/24`) and private application/DB subnets (`10.0.3.0/24` to `10.0.8.0/24`).
+- 🛣️ **Route Tables**: Managing public IGW default routing and private NAT Gateway egress route tables across multiple Availability Zones.
+- 🌍 **Internet Gateway (IGW)**: Attaching IGW for public subnet internet access and Application Load Balancer entrypoints.
+- 🛰️ **NAT Gateway**: Deploying redundant NAT Gateways with static Elastic IPs for secure outbound private subnet connectivity.
+- 🛡️ **Security Groups**: Authorizing stateful micro-segmented firewall rules at the EC2, ALB, and RDS interface levels.
+- 🔒 **Network ACLs (NACLs)**: Enforcing stateless subnet-boundary security policies for network isolation.
+
+</details>
+
+<details open>
+<summary><b>2. 💻 Compute, Elasticity & Traffic Engineering Skills</b></summary>
+
+- 🖥️ **EC2 Instances**: Provisioning stateless Web (Nginx) and Backend (Node.js) EC2 fleets across `us-east-1a` and `us-east-1b`.
+- 📀 **AMIs (Amazon Machine Images)**: Automated Golden AMI creation pre-configured with security patches and application runtimes.
+- 📜 **Launch Template**: Versioning Launch Templates standardizing instance types (`t3.medium`), IAM profiles, and user-data boot scripts.
+- 📈 **Auto Scaling Group (ASG)**: Dynamic target-tracking scaling policies, instance refresh automation, and rolling deployments.
+- ⚖️ **Load Balancer (ALB)**: Layer-7 Application Load Balancing with cross-zone traffic routing and TLS offloading.
+- 🩺 **Target Group Health Checks**: Active `/healthz` HTTP health probes (15s interval, 3 consecutive check threshold for deregistration).
+
+</details>
+
+<details open>
+<summary><b>3. 🌐 Edge, DNS, Security & Delivery Skills</b></summary>
+
+- 🗺️ **Route 53 Hosted Zone**: Public domain routing and private hosted zone (`db.internal.banking.com`) internal DNS resolution.
+- 🔐 **ACM Certificate**: Provisioning, attaching, and automatically renewing SSL/TLS 1.3 certificates via AWS Certificate Manager.
+- ⚡ **CloudFront Distribution**: Global edge caching and static asset distribution integrated with AWS WAF for perimeter defense.
+
+</details>
+
+<details open>
+<summary><b>4. 💾 Database, Storage & Identity Skills</b></summary>
+
+- 🗄️ **RDS Instance**: Amazon RDS PostgreSQL/MySQL Multi-AZ DB Clusters with synchronous replication and sub-minute auto-failover.
+- 📂 **RDS Subnet Group**: Restricting database instances strictly inside isolated private DB subnets without internet access.
+- 📁 **EFS File System**: Provisioning shared POSIX-compliant Amazon Elastic File System (EFS) mounted across multi-AZ EC2 fleets.
+- 👤 **IAM Users, Groups & Roles**: Enforcing Least Privilege access, role-based EC2 instance profiles, and strict IAM policies.
+
+</details>
+
+<details open>
+<summary><b>5. 📊 Observability, Governance & Terminal Administration Skills</b></summary>
+
+- 📊 **CloudWatch Dashboard**: Centralizing CPU, memory, disk, network metrics, and custom log alarm notifications.
+- 🕵️ **CloudTrail Event History**: Auditing management and data API calls across the AWS account for compliance and forensics.
+- 🖥️ **AWS CLI Terminal Output**: Operational scripting and administration using `aws ec2`, `aws elbv2`, `aws autoscaling`, `aws rds`, and `aws cloudwatch`.
+- 🐧 **Linux Terminal (PM2, systemctl, journalctl, ss, lsof)**: System administration, service orchestration, network socket auditing, and process management.
+
+</details>
+
 
 ---
 
