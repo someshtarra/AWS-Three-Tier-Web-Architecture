@@ -1,19 +1,20 @@
 # ==============================================================================
-# Enterprise AWS Three-Tier Architecture - VPC & Networking Terraform Module
+# Enterprise AWS Three-Tier Architecture - VPC & Networking Module
+# VPC CIDR: 10.20.0.0/16 | Topology: MindCircuit Book Store AWS 3-Tier Architecture
 # ==============================================================================
 
 provider "aws" {
   region = var.aws_region
 }
 
-# Master VPC Definition
+# Master VPC Definition (10.20.0.0/16)
 resource "aws_vpc" "main" {
-  cidr_block           = var.vpc_cidr
+  cidr_block           = "10.20.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
 
   tags = {
-    Name        = "banking-prod-vpc"
+    Name        = "mindcircuit-prod-vpc"
     Environment = "production"
     ManagedBy   = "Terraform"
   }
@@ -24,93 +25,93 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "banking-prod-igw"
+    Name = "mindcircuit-prod-igw"
   }
 }
 
 # Public Subnets (ALB & NAT Gateways)
 resource "aws_subnet" "public_1a" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.1.0/24"
+  cidr_block              = "10.20.1.0/24"
   availability_zone       = "${var.aws_region}a"
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "banking-public-subnet-1a"
+    Name = "mindcircuit-public-subnet-1a"
   }
 }
 
 resource "aws_subnet" "public_1b" {
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.2.0/24"
+  cidr_block              = "10.20.2.0/24"
   availability_zone       = "${var.aws_region}b"
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "banking-public-subnet-1b"
+    Name = "mindcircuit-public-subnet-1b"
   }
 }
 
-# Private Web Subnets
-resource "aws_subnet" "private_web_2a" {
+# Presentation Tier (Frontend React + Apache) Private Subnets
+resource "aws_subnet" "private_frontend_3a" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.3.0/24"
+  cidr_block        = "10.20.3.0/24"
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name = "banking-private-web-2a"
+    Name = "mindcircuit-private-frontend-3a"
   }
 }
 
-resource "aws_subnet" "private_web_2b" {
+resource "aws_subnet" "private_frontend_3b" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.4.0/24"
+  cidr_block        = "10.20.4.0/24"
   availability_zone = "${var.aws_region}b"
 
   tags = {
-    Name = "banking-private-web-2b"
+    Name = "mindcircuit-private-frontend-3b"
   }
 }
 
-# Private App Subnets
-resource "aws_subnet" "private_app_3a" {
+# Application Tier (Backend Node.js + Express + PM2) Private Subnets
+resource "aws_subnet" "private_backend_5a" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.5.0/24"
+  cidr_block        = "10.20.5.0/24"
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name = "banking-private-app-3a"
+    Name = "mindcircuit-private-backend-5a"
   }
 }
 
-resource "aws_subnet" "private_app_3b" {
+resource "aws_subnet" "private_backend_5b" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.6.0/24"
+  cidr_block        = "10.20.6.0/24"
   availability_zone = "${var.aws_region}b"
 
   tags = {
-    Name = "banking-private-app-3b"
+    Name = "mindcircuit-private-backend-5b"
   }
 }
 
-# Private DB Subnets
-resource "aws_subnet" "private_db_4a" {
+# Database Tier (Amazon RDS MySQL Multi-AZ) Private Subnets
+resource "aws_subnet" "private_db_7a" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.7.0/24"
+  cidr_block        = "10.20.7.0/24"
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name = "banking-private-db-4a"
+    Name = "mindcircuit-private-db-7a"
   }
 }
 
-resource "aws_subnet" "private_db_4b" {
+resource "aws_subnet" "private_db_7b" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.8.0/24"
+  cidr_block        = "10.20.8.0/24"
   availability_zone = "${var.aws_region}b"
 
   tags = {
-    Name = "banking-private-db-4b"
+    Name = "mindcircuit-private-db-7b"
   }
 }
 
@@ -129,7 +130,7 @@ resource "aws_nat_gateway" "nat_1a" {
   subnet_id     = aws_subnet.public_1a.id
 
   tags = {
-    Name = "banking-nat-gw-1a"
+    Name = "mindcircuit-nat-gw-1a"
   }
 }
 
@@ -138,6 +139,6 @@ resource "aws_nat_gateway" "nat_1b" {
   subnet_id     = aws_subnet.public_1b.id
 
   tags = {
-    Name = "banking-nat-gw-1b"
+    Name = "mindcircuit-nat-gw-1b"
   }
 }
