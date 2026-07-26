@@ -1,6 +1,6 @@
 # ==============================================================================
 # Enterprise AWS Three-Tier Architecture - Amazon RDS Multi-AZ Database Cluster
-# Engine: MySQL 8.0 | DB Name: test | Master User: admin
+# Engine: MySQL 8.0 | DB Name: test | Master User: admin | Endpoint: book.rds.com
 # ==============================================================================
 
 resource "aws_db_subnet_group" "rds_subnet_group" {
@@ -22,7 +22,7 @@ resource "aws_db_instance" "rds_primary" {
 
   db_name  = "test"
   username = "admin"
-  password = var.db_password # Defaults to sJOMVBzQizbvvmLtqoG8 in variables
+  password = var.db_password # Defaults to Somesh12345
 
   multi_az               = true
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name

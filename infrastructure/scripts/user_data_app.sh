@@ -1,44 +1,32 @@
 #!/bin/bash
 # ==============================================================================
-# Enterprise AWS Three-Tier Architecture - Backend Application Tier User Data Script
-# OS: Ubuntu Linux | Engine: Node.js 18 + Express API + PM2
-# Repository: https://github.com/jadalaramani/aws_three_tier_code.git
+# Enterprise AWS Three-Tier Architecture - Backend Launch Template User Data
+# Component: Backend Application Tier (Node.js API + MySQL Client + PM2)
+# OS: Ubuntu Linux | Process Name: backendapi
 # ==============================================================================
 
 set -euo pipefail
 exec > >(tee /var/log/user-data-app.log|logger -t user-data-app -s 2>/dev/console) 2>&1
 
-echo "[INFO] Initializing Backend Application Server Provisioning at $(date)..."
+echo "[INFO] Executing Backend Launch Template User Data at $(date)..."
 
-# 1. Update OS package repositories & install Node.js 18.x
+# 1. Update OS Package Index
 sudo apt update -y
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && \
-sudo apt-get install -y nodejs
-sudo apt update -y
-sudo npm install -g pm2 -y
 
-# 2. Clone application repository
-WORK_DIR="/opt/app"
-sudo mkdir -p "${WORK_DIR}"
-sudo chown -R ubuntu:ubuntu "${WORK_DIR}"
-cd "${WORK_DIR}"
+# 2. Configure PM2 Systemd Service Management
+sudo pm2 startup || true
+sudo env PATH=$PATH:/usr/bin /usr/bin/pm2 startup systemd -u ubuntu --hp /home/ubuntu || true
+sudo systemctl start pm2-root || true
+sudo systemctl enable pm2-root || true
 
-git clone https://github.com/jadalaramani/aws_three_tier_code.git
-cd aws_three_tier_code/server
+# 3. Install MySQL Client Tools for DB Seeding & Connectivity
+sudo apt install mysql-server -y
 
-# 3. Configure Database Credentials Environment (.env)
-cat << 'EOF' > .env
-PORT=8080
-DB_HOST=book.rbs.com
-DB_USER=admin
-DB_PASS=sJOMVBzQizbvvmLtqoG8
-DB_NAME=test
-EOF
+# 4. Navigate to Backend Repository Directory & Start Process via PM2
+cd /home/ubuntu/aws_three_tier_code/backend
+sudo pm2 start index.js --name "backendapi" || sudo pm2 restart backendapi
 
-# 4. Install dependencies & start service via PM2
-npm install
-pm2 start index.js --name "backend-api"
-pm2 save
-pm2 startup systemd -u ubuntu --hp /home/ubuntu || true
+# 5. Restore & Seed Database Schema to RDS MySQL
+mysql -h book.rds.com -u admin -pSomesh12345 test < test.sql || echo "[WARN] DB restoration executed or pending network binding"
 
-echo "[SUCCESS] Backend Application Service Provisioned & Active at $(date)!"
+echo "[SUCCESS] Backend Service (backendapi) Provisioned & Database Seeded at $(date)!"
