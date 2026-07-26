@@ -1,6 +1,6 @@
 # ==============================================================================
 # Enterprise AWS Three-Tier Architecture - Amazon RDS Multi-AZ Database Cluster
-# Engine: MySQL 8.0 | DB Name: test | Master User: admin | Endpoint: book.rds.com
+# Engine: MySQL 8.0 | DB Name: test | Master User: admin | Endpoint: banking.rds.com
 # ==============================================================================
 
 resource "aws_db_subnet_group" "rds_subnet_group" {

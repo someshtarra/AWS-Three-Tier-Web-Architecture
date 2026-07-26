@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📚 MindCircuit Book Store – AWS 3-Tier Architecture
+# 🏦 Enterprise Banking Platform – AWS 3-Tier Architecture
 ### 🚀 Production-Ready Three-Tier Cloud Infrastructure
 
 [![AWS Architecture](https://img.shields.io/badge/AWS-3--Tier_Architecture-ff9900?style=for-the-badge&logo=amazon-aws&logoColor=white)](https://aws.amazon.com/)
@@ -12,7 +12,7 @@
 
 ---
 
-![MindCircuit Book Store AWS 3-Tier Architecture Banner](assets/aws_banner.png)
+![Enterprise Banking Platform AWS 3-Tier Architecture Banner](assets/aws_banner.png)
 
 </div>
 
@@ -42,13 +42,13 @@
 
 ## 📖 Project Overview
 
-This repository demonstrates the deployment of a **highly available, secure, scalable, fault-tolerant, and production-grade MindCircuit Book Store application on AWS** using a strict **Three-Tier Architecture** following DevOps best practices and the **AWS Well-Architected Framework**.
+This repository demonstrates the deployment of a **highly available, secure, scalable, fault-tolerant, and production-grade Enterprise Banking Platform application on AWS** using a strict **Three-Tier Architecture** following DevOps best practices and the **AWS Well-Architected Framework**.
 
 The application is deployed inside a dedicated **Amazon VPC (`10.20.0.0/16`)** spanned across two Availability Zones (`us-east-1a` and `us-east-1b`):
 
 1. **Presentation Tier (Frontend)**: React + Apache web servers hosted in Private Subnets (`10.20.3.0/24` & `10.20.4.0/24`), fronted by **Frontend ALB** and public DNS endpoint **`virat.rebel7781.xyz`**.
 2. **Application Tier (Backend)**: Node.js + Express + PM2 API services hosted in Private Subnets (`10.20.5.0/24` & `10.20.6.0/24`), fronted by **Backend ALB** and public API endpoint **`api.rebel7781.xyz`**.
-3. **Database Tier (Data)**: Amazon RDS MySQL Multi-AZ Database Cluster (DB Name: `test`) isolated in Private Subnets (`10.20.7.0/24` & `10.20.8.0/24`), resolved internally via Private Hosted Zone endpoint **`book.rbs.com`**.
+3. **Database Tier (Data)**: Amazon RDS MySQL Multi-AZ Database Cluster (DB Name: `test`) isolated in Private Subnets (`10.20.7.0/24` & `10.20.8.0/24`), resolved internally via Private Hosted Zone endpoint **`banking.rds.com`**.
 
 ---
 
@@ -65,7 +65,7 @@ cd aws_three_tier_code/backend # or cd bank_portal/backend
 
 # Configure Environment Variables (.env)
 cat << 'EOF' > .env
-DB_HOST=book.rds.com
+DB_HOST=banking.rds.com
 DB_USERNAME=admin
 DB_PASSWORD="Somesh12345"
 PORT=3306
@@ -103,7 +103,7 @@ cd /home/ubuntu/aws_three_tier_code/backend
 sudo pm2 start index.js --name "backendapi"
 
 # Seed Database Schema & Data to RDS MySQL Cluster
-mysql -h book.rds.com -u admin -pSomesh12345 test < test.sql
+mysql -h banking.rds.com -u admin -pSomesh12345 test < test.sql
 ```
 
 ### 4. Amazon RDS MySQL Configuration
@@ -111,14 +111,14 @@ mysql -h book.rds.com -u admin -pSomesh12345 test < test.sql
 - **Database Name**: `test`
 - **Master Username**: `admin`
 - **Master Password**: `"Somesh12345"`
-- **Endpoint**: `book.rds.com` (Private Hosted Zone)
-- **Database Restoration**: `mysql -h book.rds.com -u admin -pSomesh12345 test < test.sql`
+- **Endpoint**: `banking.rds.com` (Private Hosted Zone)
+- **Database Restoration**: `mysql -h banking.rds.com -u admin -pSomesh12345 test < test.sql`
 
 ---
 
 ## 📐 Architecture Diagram
 
-### 🏗️ MindCircuit Book Store - AWS 3-Tier Network Topology
+### 🏗️ Enterprise Banking Platform - AWS 3-Tier Network Topology
 
 ```
                                       +--------------------------------------------------------+
@@ -180,7 +180,7 @@ mysql -h book.rds.com -u admin -pSomesh12345 test < test.sql
   |                                                          |                                                                  |
   |   +---------------------------------------------------------------------------------------------------------------------+   |
   |   |                        AMAZON RDS MYSQL (MULTI-AZ) DATABASE CLUSTER                                                |   |
-  |   |                        DB Name: test  |  Private DNS: book.rbs.com (rbs.com zone)                                |   |
+  |   |                        DB Name: test  |  Private DNS: banking.rds.com (banking.com zone)                           |   |
   |   +---------------------------------------------------------------------------------------------------------------------+   |
   --------------------------------------------------------------------------------------------------------------------------------
 ```
@@ -189,7 +189,7 @@ mysql -h book.rds.com -u admin -pSomesh12345 test < test.sql
 
 ## 🛠️ AWS Services Used
 
-| AWS Service | Category | Purpose in MindCircuit Architecture | Real-World Usage |
+| AWS Service | Category | Purpose in Enterprise Banking Architecture | Real-World Usage |
 | :--- | :--- | :--- | :--- |
 | **Amazon VPC** | Networking | Virtual private cloud enclosure | Isolated network (`10.20.0.0/16`) spanning AZ-a and AZ-b. |
 | **Public Subnets** | Networking | Ingress for Load Balancers & NAT | Hosts Public Subnets `10.20.1.0/24` (AZ-a) and `10.20.2.0/24` (AZ-b). |
@@ -201,7 +201,7 @@ mysql -h book.rds.com -u admin -pSomesh12345 test < test.sql
 | **Amazon EC2 (Backend)** | Compute | Application Tier nodes | Executes Node.js + Express API microservices managed by PM2 process manager. |
 | **Amazon RDS MySQL** | Database | Multi-AZ Relational Storage | Managed MySQL DB Cluster (DB Name: `test`) with auto-failover in `10.20.7.0/24` & `10.20.8.0/24`. |
 | **Route 53 Public Zone** | DNS | Domain routing for external users | Resolves `rebel7781.xyz` (`virat.rebel7781.xyz` & `api.rebel7781.xyz`). |
-| **Route 53 Private Zone** | DNS | Internal private DNS resolution | Resolves `rbs.com` internal zone (`book.rbs.com` -> RDS Endpoint). |
+| **Route 53 Private Zone** | DNS | Internal private DNS resolution | Resolves `banking.com` internal zone (`banking.rds.com` -> RDS Endpoint). |
 | **Auto Scaling Group** | Compute | Elastic compute capacity | Auto-scales EC2 nodes based on CPU & traffic load across AZ-a and AZ-b. |
 | **AWS ACM** | Security | SSL/TLS Certificate Manager | Manages HTTPS TLS 1.3 certificates for ALB listeners. |
 | **Security Groups** | Security | Stateful micro-segmentation | Controls port-level ingress (`80`, `443`, `8080`, `3306`) between tiers. |
@@ -232,8 +232,8 @@ VPC CIDR: 10.20.0.0/16
 1. **Public Hosted Zone (`rebel7781.xyz`)**:
    - `virat.rebel7781.xyz` $\rightarrow$ Frontend Application Load Balancer
    - `api.rebel7781.xyz` $\rightarrow$ Backend Application Load Balancer
-2. **Private Hosted Zone (`rbs.com`)**:
-   - `book.rbs.com` $\rightarrow$ Amazon RDS MySQL Endpoint (DB Name: `test`)
+2. **Private Hosted Zone (`banking.com`)**:
+   - `banking.rds.com` $\rightarrow$ Amazon RDS MySQL Endpoint (DB Name: `test`)
 
 ---
 
@@ -329,9 +329,9 @@ journalctl -u nodejs-api -n 50 --no-pager
 
 | # | Issue | Symptoms | Root Cause | Resolution Strategy |
 | :---: | :--- | :--- | :--- | :--- |
-| 1 | **RDS Connection Timeout** | Backend logs `ETIMEDOUT` to `book.rbs.com` | `DB-SG` missing ingress rule for `Backend-SG` on port 3306. | Update MySQL SG to allow port 3306 from `Backend-SG` (`10.20.5.0/24`, `10.20.6.0/24`). |
+| 1 | **RDS Connection Timeout** | Backend logs `ETIMEDOUT` to `banking.rds.com` | `DB-SG` missing ingress rule for `Backend-SG` on port 3306. | Update MySQL SG to allow port 3306 from `Backend-SG` (`10.20.5.0/24`, `10.20.6.0/24`). |
 | 2 | **502 Bad Gateway** | `virat.rebel7781.xyz` returns 502 | Apache/React server crashed in `10.20.3.0/24`. | Check Apache service (`systemctl status apache2`), verify port 80 bound. |
-| 3 | **DNS Resolution Failure** | Cannot resolve `book.rbs.com` | Private Hosted Zone `rbs.com` not associated with VPC `10.20.0.0/16`. | Associate `rbs.com` Private Hosted Zone to VPC `10.20.0.0/16`. |
+| 3 | **DNS Resolution Failure** | Cannot resolve `banking.rds.com` | Private Hosted Zone `banking.com` not associated with VPC `10.20.0.0/16`. | Associate `banking.com` Private Hosted Zone to VPC `10.20.0.0/16`. |
 | 4 | **NAT Gateway Egress Failure** | Private EC2 cannot fetch `apt-get` updates | Route table for `10.20.3.0/24` missing `0.0.0.0/0` -> NAT GW. | Add route `0.0.0.0/0` -> NAT Gateway in private route table. |
 
 ---
@@ -344,7 +344,7 @@ AWS_CLOUD/
 │   └── workflows/
 │       └── ci-cd-pipeline.yml         # GitHub Actions deployment automation
 ├── assets/
-│   └── aws_banner.png                 # MindCircuit Book Store 3-Tier Architecture Diagram
+│   └── aws_banner.png                 # Enterprise Banking Platform 3-Tier Architecture Diagram
 ├── app/
 │   ├── api/
 │   │   ├── package.json               # Backend Node.js service dependencies
@@ -382,8 +382,8 @@ AWS_CLOUD/
 - 🟢 **High Availability**: Multi-AZ deployment across `us-east-1a` & `us-east-1b`.
 - ⚡ **Auto Scaling**: Elastic compute scaling for React & Node.js tiers.
 - ⚖️ **Dual ALB Traffic Routing**: Separate Frontend ALB (`virat.rebel7781.xyz`) & Backend ALB (`api.rebel7781.xyz`).
-- 🗺️ **Dual Route 53 Zones**: Public Hosted Zone (`rebel7781.xyz`) & Private Hosted Zone (`rbs.com`).
-- 🗄️ **Managed MySQL Multi-AZ**: Amazon RDS MySQL (DB Name: `test`, Endpoint: `book.rbs.com`).
+- 🗺️ **Dual Route 53 Zones**: Public Hosted Zone (`rebel7781.xyz`) & Private Hosted Zone (`banking.com`).
+- 🗄️ **Managed MySQL Multi-AZ**: Amazon RDS MySQL (DB Name: `test`, Endpoint: `banking.rds.com`).
 - 🔒 **Zero Public Workload Exposure**: All EC2 & DB instances isolated in Private Subnets (`10.20.3.0/24` - `10.20.8.0/24`).
 
 ---
@@ -421,7 +421,7 @@ The following enterprise skills, AWS Console management workflows, and Linux adm
 <details open>
 <summary><b>3. 🌐 Edge, DNS, Security & Delivery Skills</b></summary>
 
-- 🗺️ **Route 53 Hosted Zones**: Public Hosted Zone (`rebel7781.xyz`) and Private Hosted Zone (`rbs.com`).
+- 🗺️ **Route 53 Hosted Zones**: Public Hosted Zone (`rebel7781.xyz`) and Private Hosted Zone (`banking.com`).
 - 🔐 **ACM Certificate**: Provisioning, attaching, and automatically renewing SSL/TLS 1.3 certificates via AWS Certificate Manager.
 - ⚡ **CloudFront Distribution**: Global edge caching and static asset distribution integrated with AWS WAF for perimeter defense.
 
@@ -430,7 +430,7 @@ The following enterprise skills, AWS Console management workflows, and Linux adm
 <details open>
 <summary><b>4. 💾 Database, Storage & Identity Skills</b></summary>
 
-- 🗄️ **RDS Instance**: Amazon RDS MySQL Multi-AZ DB Cluster (DB Name: `test`, Endpoint: `book.rbs.com`).
+- 🗄️ **RDS Instance**: Amazon RDS MySQL Multi-AZ DB Cluster (DB Name: `test`, Endpoint: `banking.rds.com`).
 - 📂 **RDS Subnet Group**: Restricting database instances strictly inside isolated private DB subnets (`10.20.7.0/24` & `10.20.8.0/24`).
 - 📁 **EFS File System**: Provisioning shared POSIX-compliant Amazon Elastic File System (EFS) mounted across multi-AZ EC2 fleets.
 - 👤 **IAM Users, Groups & Roles**: Enforcing Least Privilege access, role-based EC2 instance profiles, and strict IAM policies.

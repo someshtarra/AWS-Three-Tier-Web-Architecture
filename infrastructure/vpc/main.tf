@@ -1,6 +1,6 @@
 # ==============================================================================
 # Enterprise AWS Three-Tier Architecture - VPC & Networking Module
-# VPC CIDR: 10.20.0.0/16 | Topology: MindCircuit Book Store AWS 3-Tier Architecture
+# VPC CIDR: 10.20.0.0/16 | Topology: Enterprise Banking Platform AWS 3-Tier Architecture
 # ==============================================================================
 
 provider "aws" {
@@ -14,7 +14,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 
   tags = {
-    Name        = "mindcircuit-prod-vpc"
+    Name        = "banking-prod-vpc"
     Environment = "production"
     ManagedBy   = "Terraform"
   }
@@ -25,7 +25,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "mindcircuit-prod-igw"
+    Name = "banking-prod-igw"
   }
 }
 
@@ -37,7 +37,7 @@ resource "aws_subnet" "public_1a" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "mindcircuit-public-subnet-1a"
+    Name = "banking-public-subnet-1a"
   }
 }
 
@@ -48,7 +48,7 @@ resource "aws_subnet" "public_1b" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "mindcircuit-public-subnet-1b"
+    Name = "banking-public-subnet-1b"
   }
 }
 
@@ -59,7 +59,7 @@ resource "aws_subnet" "private_frontend_3a" {
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name = "mindcircuit-private-frontend-3a"
+    Name = "banking-private-frontend-3a"
   }
 }
 
@@ -69,7 +69,7 @@ resource "aws_subnet" "private_frontend_3b" {
   availability_zone = "${var.aws_region}b"
 
   tags = {
-    Name = "mindcircuit-private-frontend-3b"
+    Name = "banking-private-frontend-3b"
   }
 }
 
@@ -80,7 +80,7 @@ resource "aws_subnet" "private_backend_5a" {
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name = "mindcircuit-private-backend-5a"
+    Name = "banking-private-backend-5a"
   }
 }
 
@@ -90,7 +90,7 @@ resource "aws_subnet" "private_backend_5b" {
   availability_zone = "${var.aws_region}b"
 
   tags = {
-    Name = "mindcircuit-private-backend-5b"
+    Name = "banking-private-backend-5b"
   }
 }
 
@@ -101,7 +101,7 @@ resource "aws_subnet" "private_db_7a" {
   availability_zone = "${var.aws_region}a"
 
   tags = {
-    Name = "mindcircuit-private-db-7a"
+    Name = "banking-private-db-7a"
   }
 }
 
@@ -111,7 +111,7 @@ resource "aws_subnet" "private_db_7b" {
   availability_zone = "${var.aws_region}b"
 
   tags = {
-    Name = "mindcircuit-private-db-7b"
+    Name = "banking-private-db-7b"
   }
 }
 
@@ -130,7 +130,7 @@ resource "aws_nat_gateway" "nat_1a" {
   subnet_id     = aws_subnet.public_1a.id
 
   tags = {
-    Name = "mindcircuit-nat-gw-1a"
+    Name = "banking-nat-gw-1a"
   }
 }
 
@@ -139,6 +139,6 @@ resource "aws_nat_gateway" "nat_1b" {
   subnet_id     = aws_subnet.public_1b.id
 
   tags = {
-    Name = "mindcircuit-nat-gw-1b"
+    Name = "banking-nat-gw-1b"
   }
 }

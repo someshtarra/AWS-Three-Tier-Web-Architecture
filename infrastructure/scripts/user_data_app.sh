@@ -27,6 +27,6 @@ cd /home/ubuntu/aws_three_tier_code/backend
 sudo pm2 start index.js --name "backendapi" || sudo pm2 restart backendapi
 
 # 5. Restore & Seed Database Schema to RDS MySQL
-mysql -h book.rds.com -u admin -pSomesh12345 test < test.sql || echo "[WARN] DB restoration executed or pending network binding"
+mysql -h banking.rds.com -u admin -pSomesh12345 test < test.sql || echo "[WARN] DB restoration executed or pending network binding"
 
 echo "[SUCCESS] Backend Service (backendapi) Provisioned & Database Seeded at $(date)!"
