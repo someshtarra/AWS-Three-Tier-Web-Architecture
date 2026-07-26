@@ -56,9 +56,12 @@ The application is deployed inside a dedicated **Amazon VPC (`10.20.0.0/16`)** s
 
 ### 1. Backend Application Tier Setup (`backend`)
 ```bash
-# Clone application repository
+# Clone application repository (Primary or Bank Portal Mirror)
 git clone https://github.com/jadalaramani/aws_three_tier_code.git
-cd aws_three_tier_code/backend
+# OR
+git clone https://github.com/someshtarra/bank_portal.git
+
+cd aws_three_tier_code/backend # or cd bank_portal/backend
 
 # Configure Environment Variables (.env)
 cat << 'EOF' > .env
