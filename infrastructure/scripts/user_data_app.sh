@@ -23,8 +23,8 @@ sudo systemctl enable pm2-root || true
 sudo apt install mysql-server -y
 
 # 4. Navigate to Backend Repository Directory & Start Process via PM2
-cd /home/ubuntu/aws_three_tier_code/backend
-sudo pm2 start index.js --name "backendapi" || sudo pm2 restart backendapi
+cd /home/ubuntu/AWS-Three-Tier-Web-Architecture/app/api || cd /home/ubuntu/aws_three_tier_code/backend
+sudo pm2 start server.js --name "backendapi" || sudo pm2 start index.js --name "backendapi" || sudo pm2 restart backendapi
 
 # 5. Restore & Seed Database Schema to RDS MySQL
 mysql -h banking.rds.com -u admin -pSomesh12345 test < test.sql || echo "[WARN] DB restoration executed or pending network binding"

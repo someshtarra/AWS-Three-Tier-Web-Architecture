@@ -54,14 +54,16 @@ The application is deployed inside a dedicated **Amazon VPC (`10.20.0.0/16`)** s
 
 ## ⚡ Quickstart & User Data Provisioning
 
-### 1. Backend Application Tier Setup (`backend`)
+### 1. Backend Application Tier Setup (`app/api`)
 ```bash
-# Clone application repository (Primary or Bank Portal Mirror)
-git clone https://github.com/jadalaramani/aws_three_tier_code.git
-# OR
-git clone https://github.com/someshtarra/bank_portal.git
+# Clone application repository (Developer Source Repo)
+git clone https://github.com/someshtarra/AWS-Three-Tier-Web-Architecture.git
 
-cd aws_three_tier_code/backend # or cd bank_portal/backend
+# OR Application Mirrors
+# git clone https://github.com/someshtarra/bank_portal.git
+# git clone https://github.com/jadalaramani/aws_three_tier_code.git
+
+cd AWS-Three-Tier-Web-Architecture/app/api
 
 # Configure Environment Variables (.env)
 cat << 'EOF' > .env
@@ -77,7 +79,7 @@ npm install dotenv
 npm install mysql2
 
 # Start Backend API Service via PM2
-sudo pm2 start index.js --name "backendapi"
+sudo pm2 start server.js --name "backendapi"
 ```
 
 ### 2. Frontend Launch Template User Data Script (`user_data_web.sh`)
@@ -99,8 +101,8 @@ sudo systemctl enable pm2-root
 sudo apt install mysql-server -y
 
 # Navigate to backend directory & start process
-cd /home/ubuntu/aws_three_tier_code/backend
-sudo pm2 start index.js --name "backendapi"
+cd /home/ubuntu/AWS-Three-Tier-Web-Architecture/app/api || cd /home/ubuntu/aws_three_tier_code/backend
+sudo pm2 start server.js --name "backendapi" || sudo pm2 start index.js --name "backendapi"
 
 # Seed Database Schema & Data to RDS MySQL Cluster
 mysql -h banking.rds.com -u admin -pSomesh12345 test < test.sql
