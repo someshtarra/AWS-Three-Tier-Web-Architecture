@@ -20,6 +20,7 @@
 
 ## 📌 Table of Contents
 - [📖 Project Overview](#-project-overview)
+- [⚡ Quickstart & Repository Setup](#-quickstart--repository-setup)
 - [📐 Architecture Diagram](#-architecture-diagram)
 - [🛠️ AWS Services Used](#%EF%B8%8F-aws-services-used)
 - [🌐 Network Architecture](#-network-architecture)
@@ -48,6 +49,27 @@ The application is deployed inside a dedicated **Amazon VPC (`10.20.0.0/16`)** s
 1. **Presentation Tier (Frontend)**: React + Apache web servers hosted in Private Subnets (`10.20.3.0/24` & `10.20.4.0/24`), fronted by **Frontend ALB** and public DNS endpoint **`virat.rebel7781.xyz`**.
 2. **Application Tier (Backend)**: Node.js + Express + PM2 API services hosted in Private Subnets (`10.20.5.0/24` & `10.20.6.0/24`), fronted by **Backend ALB** and public API endpoint **`api.rebel7781.xyz`**.
 3. **Database Tier (Data)**: Amazon RDS MySQL Multi-AZ Database Cluster (DB Name: `test`) isolated in Private Subnets (`10.20.7.0/24` & `10.20.8.0/24`), resolved internally via Private Hosted Zone endpoint **`book.rbs.com`**.
+
+---
+
+## ⚡ Quickstart & Repository Setup
+
+To clone, set up, and deploy the application repository locally or in your AWS environment:
+
+```bash
+# 1. Clone the Bank Portal repository
+git clone https://github.com/someshtarra/bank_portal.git
+
+# 2. Navigate to the project root
+cd bank_portal
+
+# 3. Install Application Tier (Backend) dependencies
+cd app/api
+npm install
+
+# 4. Start local API server engine
+npm start
+```
 
 ---
 
