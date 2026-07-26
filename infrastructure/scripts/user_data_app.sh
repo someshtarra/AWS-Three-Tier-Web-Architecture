@@ -1,75 +1,44 @@
 #!/bin/bash
 # ==============================================================================
-# Enterprise AWS Three-Tier Architecture - Application (Logic) Tier Bootstrap
-# Component: Backend API Service (Node.js/Express Engine)
-# Author: Senior Cloud & DevOps Engineer
+# Enterprise AWS Three-Tier Architecture - Backend Application Tier User Data Script
+# OS: Ubuntu Linux | Engine: Node.js 18 + Express API + PM2
+# Repository: https://github.com/jadalaramani/aws_three_tier_code.git
 # ==============================================================================
 
 set -euo pipefail
-
 exec > >(tee /var/log/user-data-app.log|logger -t user-data-app -s 2>/dev/console) 2>&1
 
-echo "[INFO] Initializing Application Tier..."
+echo "[INFO] Initializing Backend Application Server Provisioning at $(date)..."
 
-# Update system
-yum update -y
-curl -sL https://rpm.nodesource.com/setup_18.x | bash -
-yum install -y nodejs amazon-efs-utils amazon-cloudwatch-agent jq
+# 1. Update OS package repositories & install Node.js 18.x
+sudo apt update -y
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && \
+sudo apt-get install -y nodejs
+sudo apt update -y
+sudo npm install -g pm2 -y
 
-# Mount AWS EFS for shared application data
-EFS_ID="fs-0a1b2c3d4e5f67890" # Replaced dynamically via Terraform
-MOUNT_POINT="/mnt/efs/banking-shared"
+# 2. Clone application repository
+WORK_DIR="/opt/app"
+sudo mkdir -p "${WORK_DIR}"
+sudo chown -R ubuntu:ubuntu "${WORK_DIR}"
+cd "${WORK_DIR}"
 
-mkdir -p "${MOUNT_POINT}"
-mount -t efs -o tls "${EFS_ID}:/" "${MOUNT_POINT}" || echo "[WARN] EFS Mount pending DNS propagation"
-echo "${EFS_ID}:/ ${MOUNT_POINT} efs _netdev,tls 0 0" >> /etc/fstab
+git clone https://github.com/jadalaramani/aws_three_tier_code.git
+cd aws_three_tier_code/server
 
-# Install PM2 globally
-npm install -g pm2
-
-# Deploy Application Code
-APP_DIR="/opt/banking-api"
-mkdir -p "${APP_DIR}"
-
-cat << 'EOF' > "${APP_DIR}/server.js"
-const express = require('express');
-const mysql = require('mysql2/promise');
-const app = express();
-const PORT = process.env.PORT || 8080;
-
-app.use(express.json());
-
-// Health Check endpoint for ALB / Target Group
-app.get('/health', async (req, res) => {
-    res.status(200).json({
-        status: 'HEALTHY',
-        service: 'Banking App Engine',
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString()
-    });
-});
-
-app.get('/api/v1/accounts', async (req, res) => {
-    res.json({
-        accounts: [
-            { id: "ACC-98412", type: "Checking", balance: 54320.50, currency: "USD" },
-            { id: "ACC-31049", type: "Savings", balance: 125000.00, currency: "USD" }
-        ]
-    });
-});
-
-app.listen(PORT, () => {
-    console.log(`[INFO] Banking Backend Service running on port ${PORT}`);
-});
+# 3. Configure Database Credentials Environment (.env)
+cat << 'EOF' > .env
+PORT=8080
+DB_HOST=book.rbs.com
+DB_USER=admin
+DB_PASS=sJOMVBzQizbvvmLtqoG8
+DB_NAME=test
 EOF
 
-cd "${APP_DIR}"
-npm init -y
-npm install express mysql2 dotenv
-
-# Start service via PM2
-pm2 start server.js --name "banking-backend" --instances max
+# 4. Install dependencies & start service via PM2
+npm install
+pm2 start index.js --name "backend-api"
 pm2 save
-pm2 startup systemd -u root --hp /root
+pm2 startup systemd -u ubuntu --hp /home/ubuntu || true
 
-echo "[SUCCESS] Application Tier Service Started!"
+echo "[SUCCESS] Backend Application Service Provisioned & Active at $(date)!"

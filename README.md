@@ -52,24 +52,68 @@ The application is deployed inside a dedicated **Amazon VPC (`10.20.0.0/16`)** s
 
 ---
 
-## ⚡ Quickstart & Repository Setup
+## ⚡ Quickstart & User Data Provisioning
 
-To clone, set up, and deploy the application repository locally or in your AWS environment:
-
+### 1. Repository Setup & Client Config
 ```bash
-# 1. Clone the AWS Three-Tier Architecture repository
+# Clone the AWS Three-Tier Architecture repository
 git clone https://github.com/jadalaramani/aws_three_tier_code.git
 
-# 2. Navigate to the project root
-cd aws_three_tier_code
+# Configure Frontend API Endpoint in client/src/pages/config.js
+cd aws_three_tier_code/client
+cat << 'EOF' > src/pages/config.js
+export const API_BASE_URL = "https://api.b17facebook.xyz";
+EOF
 
-# 3. Install Application Tier (Backend) dependencies
-cd app/api
+# Install dependencies & build production static bundle
 npm install
-
-# 4. Start local API server engine
-npm start
+npm run build
+sudo cp -r build/* /var/www/html
 ```
+
+### 2. Frontend Web Tier User Data Script (`user_data_web.sh`)
+```bash
+#!/bin/bash
+sudo apt update -y
+sudo apt install apache2 -y
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && \
+sudo apt-get install -y nodejs -y
+sudo apt update -y
+sudo npm install -g corepack -y
+corepack enable
+corepack prepare yarn@stable --activate
+sudo npm install -g pm2
+
+git clone https://github.com/jadalaramani/aws_three_tier_code.git
+cd aws_three_tier_code/client
+echo 'export const API_BASE_URL = "https://api.b17facebook.xyz";' > src/pages/config.js
+npm install
+npm run build
+sudo cp -r build/* /var/www/html
+```
+
+### 3. Backend Application Tier User Data Script (`user_data_app.sh`)
+```bash
+#!/bin/bash
+sudo apt update -y
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && \
+sudo apt-get install -y nodejs -y
+sudo apt update -y
+sudo npm install -g pm2 -y
+
+git clone https://github.com/jadalaramani/aws_three_tier_code.git
+cd aws_three_tier_code/server
+npm install
+pm2 start index.js --name "backend-api"
+pm2 save
+```
+
+### 4. Amazon RDS MySQL Credentials
+- **Engine**: MySQL 8.0 Multi-AZ
+- **Database Name**: `test`
+- **Master Username**: `admin`
+- **Master Password**: `sJOMVBzQizbvvmLtqoG8`
+- **Private DNS Endpoint**: `book.rbs.com` (`rbs.com` Private Hosted Zone)
 
 ---
 

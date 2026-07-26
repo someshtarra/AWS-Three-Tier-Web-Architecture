@@ -1,5 +1,6 @@
 # ==============================================================================
 # Enterprise AWS Three-Tier Architecture - Amazon RDS Multi-AZ Database Cluster
+# Engine: MySQL 8.0 | DB Name: test | Master User: admin
 # ==============================================================================
 
 resource "aws_db_subnet_group" "rds_subnet_group" {
@@ -15,13 +16,13 @@ resource "aws_db_instance" "rds_primary" {
   identifier            = "banking-prod-db"
   allocated_storage     = 100
   max_allocated_storage = 500
-  engine                = "postgres"
-  engine_version        = "15.4"
+  engine                = "mysql"
+  engine_version        = "8.0"
   instance_class        = "db.m6i.large"
 
-  db_name  = "banking_db"
-  username = "db_admin"
-  password = var.db_password
+  db_name  = "test"
+  username = "admin"
+  password = var.db_password # Defaults to sJOMVBzQizbvvmLtqoG8 in variables
 
   multi_az               = true
   db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.name

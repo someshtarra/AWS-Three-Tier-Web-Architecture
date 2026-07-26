@@ -1,124 +1,53 @@
 #!/bin/bash
 # ==============================================================================
-# Enterprise AWS Three-Tier Architecture - Web Tier Bootstrap Script
-# Component: Frontend Web Server (Nginx / Reverse Proxy)
-# Author: Senior Cloud & DevOps Engineer
+# Enterprise AWS Three-Tier Architecture - Frontend Web Tier User Data Script
+# OS: Ubuntu Linux | Engine: Apache2 + Node.js 18 + React Client Build
+# Repository: https://github.com/jadalaramani/aws_three_tier_code.git
 # ==============================================================================
 
 set -euo pipefail
+exec > >(tee /var/log/user-data-web.log|logger -t user-data-web -s 2>/dev/console) 2>&1
 
-# Log all output to user-data log file
-exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+echo "[INFO] Initializing Frontend Web Server Provisioning at $(date)..."
 
-echo "[INFO] Starting Web Tier Provisioning at $(date)..."
+# 1. Update OS package repositories & install Apache2
+sudo apt update -y
+sudo apt install apache2 -y
 
-# Update packages & install dependencies
-yum update -y
-amazon-linux-extras install nginx1 -y || yum install -y nginx
-yum install -y amazon-cloudwatch-agent curl jq htop
+# 2. Install Node.js 18.x runtime & Corepack / Yarn
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && \
+sudo apt-get install -y nodejs
+sudo apt update -y
 
-# Configure CloudWatch Agent
-cat << 'EOF' > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
-{
-  "agent": {
-    "metrics_collection_interval": 60,
-    "run_as_user": "root"
-  },
-  "metrics": {
-    "append_dimensions": {
-      "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
-      "InstanceId": "${aws:InstanceId}"
-    },
-    "metrics_collected": {
-      "mem": {
-        "measurement": ["mem_used_percent"],
-        "metrics_collection_interval": 30
-      },
-      "disk": {
-        "measurement": ["used_percent"],
-        "metrics_collection_interval": 60,
-        "resources": ["/"]
-      }
-    }
-  },
-  "logs": {
-    "logs_collected": {
-      "files": {
-        "collect_list": [
-          {
-            "file_path": "/var/log/nginx/access.log",
-            "log_group_name": "/aws/ec2/banking-platform/web/nginx-access",
-            "log_stream_name": "{instance_id}"
-          },
-          {
-            "file_path": "/var/log/nginx/error.log",
-            "log_group_name": "/aws/ec2/banking-platform/web/nginx-error",
-            "log_stream_name": "{instance_id}"
-          }
-        ]
-      }
-    }
-  }
-}
+sudo npm install -g corepack -y
+corepack enable
+corepack prepare yarn@stable --activate
+sudo npm install -g pm2 -y
+
+# 3. Clone application repository
+WORK_DIR="/opt/app"
+sudo mkdir -p "${WORK_DIR}"
+sudo chown -R ubuntu:ubuntu "${WORK_DIR}"
+cd "${WORK_DIR}"
+
+git clone https://github.com/jadalaramani/aws_three_tier_code.git
+cd aws_three_tier_code/client
+
+# 4. Configure API endpoint in src/pages/config.js
+cat << 'EOF' > src/pages/config.js
+export const API_BASE_URL = "https://api.b17facebook.xyz";
 EOF
 
-# Start CloudWatch Agent
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
-  -a fetch-config \
-  -m ec2 \
-  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json \
-  -s
+# 5. Build React production bundle
+npm install
+npm run build
 
-# Configure Nginx Reverse Proxy
-cat << 'EOF' > /etc/nginx/conf.d/banking_app.conf
-upstream backend_app {
-    server 10.0.5.10:8080 max_fails=3 fail_timeout=10s;
-    server 10.0.6.10:8080 max_fails=3 fail_timeout=10s;
-    keepalive 32;
-}
+# 6. Deploy static assets to Apache web root directory
+sudo rm -rf /var/www/html/*
+sudo cp -r build/* /var/www/html/
 
-server {
-    listen 80 default_server;
-    server_name _;
+# 7. Restart & enable Apache2 service
+sudo systemctl enable apache2
+sudo systemctl restart apache2
 
-    # Security Headers
-    add_header X-Frame-Options "DENY" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-
-    # Health Check Endpoint for ALB
-    location /healthz {
-        access_log off;
-        return 200 '{"status":"UP","tier":"web","timestamp":"$time_iso8601"}';
-        add_header Content-Type application/json;
-    }
-
-    # Proxy traffic to Logic Tier (Backend EC2 Instances)
-    location /api/ {
-        proxy_pass http://backend_app/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 5s;
-        proxy_read_timeout 60s;
-    }
-
-    # Static Assets
-    location / {
-        root /var/www/html;
-        index index.html;
-        try_files $uri $uri/ /index.html;
-    }
-}
-EOF
-
-# Enable & start Nginx
-systemctl enable nginx
-systemctl restart nginx
-
-echo "[SUCCESS] Web Tier provisioned successfully at $(date)!"
+echo "[SUCCESS] Frontend Web Server Provisioned & Active at $(date)!"
