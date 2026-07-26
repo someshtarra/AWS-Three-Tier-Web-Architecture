@@ -57,11 +57,11 @@ The application is deployed inside a dedicated **Amazon VPC (`10.20.0.0/16`)** s
 To clone, set up, and deploy the application repository locally or in your AWS environment:
 
 ```bash
-# 1. Clone the Bank Portal repository
-git clone https://github.com/someshtarra/bank_portal.git
+# 1. Clone the AWS Three-Tier Architecture repository
+git clone https://github.com/jadalaramani/aws_three_tier_code.git
 
 # 2. Navigate to the project root
-cd bank_portal
+cd aws_three_tier_code
 
 # 3. Install Application Tier (Backend) dependencies
 cd app/api
