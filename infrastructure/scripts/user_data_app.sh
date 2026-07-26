@@ -22,8 +22,9 @@ sudo systemctl enable pm2-root || true
 # 3. Install MySQL Client Tools for DB Seeding & Connectivity
 sudo apt install mysql-server -y
 
-# 4. Navigate to Backend Repository Directory & Start Process via PM2
-cd /home/ubuntu/AWS-Three-Tier-Web-Architecture/app/api || cd /home/ubuntu/aws_three_tier_code/backend
+# 4. Clone & Navigate to Developer Application Repository (bank_portal / AWS-Three-Tier-Web-Architecture)
+git clone https://github.com/someshtarra/bank_portal.git /home/ubuntu/bank_portal || true
+cd /home/ubuntu/bank_portal/backend || cd /home/ubuntu/AWS-Three-Tier-Web-Architecture/app/api || cd /home/ubuntu/aws_three_tier_code/backend
 sudo pm2 start server.js --name "backendapi" || sudo pm2 start index.js --name "backendapi" || sudo pm2 restart backendapi
 
 # 5. Restore & Seed Database Schema to RDS MySQL

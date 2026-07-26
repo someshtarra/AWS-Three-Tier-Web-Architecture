@@ -128,6 +128,21 @@ The platform features an institutional dark-mode design system built with React 
 
 ### 🔗 Step-by-Step AWS Connection Guide: Frontend ➔ Backend ➔ Database
 
+#### 0. Developer Source Code Repository Setup (Clone Coding)
+
+For clone coding and deploying the core application code provided by developers, clone the primary application repository:
+
+```bash
+# Clone Developer Application Repository (Bank Portal)
+git clone https://github.com/someshtarra/bank_portal.git
+
+# OR Clone Master AWS Infrastructure & Web Architecture Repository
+git clone https://github.com/someshtarra/AWS-Three-Tier-Web-Architecture.git
+
+# Navigate to application workspace
+cd bank_portal/backend  # or cd AWS-Three-Tier-Web-Architecture/app/api
+```
+
 #### 1. Connecting Frontend to Backend API in AWS
 
 The React Frontend connects to the Node.js Backend API using Vite Environment Variables, Axios API Interceptors, and AWS Application Load Balancers:
